@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify 2FA Code</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .notification {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <form id="verify-2fa-form" action="{{ url_for('verify_2fa') }}" method="post">
+            <h2>Verify 2FA Code</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="notification">
+                        {% for category, message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <div class="form-group">
+                <label for="otp_code">2FA Code:</label>
+                <input type="text" id="otp_code" name="otp_code" required>
+            </div>
+            <button type="submit">Verify</button>
+        </form>
+    </div>
+</body>
+</html>

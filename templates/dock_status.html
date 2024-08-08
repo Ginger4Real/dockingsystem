@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dock Status</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto; /* Center container */
+        }
+
+        .status-container {
+            margin-top: 20px;
+        }
+
+        .dock-entry {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .dock-image {
+            margin-bottom: 10px;
+            width: 100vw; /* Full viewport width */
+            max-width: 100%; /* Constrain to viewport width */
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Prevent inline spacing issues */
+        }
+
+        .dock-number {
+    font-weight: bold;  /* Makes the text bold */
+    margin-top: 10px;   /* Adds space above the text */
+    font-size: 100px;    /* Sets the text size */
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-container">
+            <!-- Dock entries will be dynamically populated here -->
+        </div>
+    </div>
+
+    <script>
+        function fetchDockStatus() {
+            fetch("/docks")
+                .then((response) => response.json())
+                .then((data) => {
+                    const statusContainer = document.querySelector(".status-container");
+                    statusContainer.innerHTML = ""; // Clear any existing content
+
+                    if (data.docks.length === 0) {
+                        // No docks are assigned, show blank screen
+                        statusContainer.style.display = "none"; // Hide status container
+                    } else {
+                        // Show only the most recent dock assignment
+                        data.docks.forEach((dock) => {
+                            if (dock.license_plate) {
+                                // Only create entries if there's a license plate
+                                const dockEntry = document.createElement("div");
+                                dockEntry.className = "dock-entry";
+
+                                const dockImage = document.createElement("img");
+                                dockImage.className = "dock-image";
+                                dockImage.src = `/license-plate-image/${encodeURIComponent(dock.license_plate)}`;
+                                dockImage.alt = `License Plate ${dock.license_plate}`;
+
+                                const dockNumber = document.createElement("div");
+                                dockNumber.className = "dock-number";
+                                dockNumber.textContent = `Dock ${dock.number}`;
+
+                                dockEntry.appendChild(dockImage); // License plate image comes first
+                                dockEntry.appendChild(dockNumber);
+                                statusContainer.appendChild(dockEntry);
+                            }
+                        });
+                    }
+                });
+        }
+
+        // Fetch dock status initially
+        fetchDockStatus();
+
+        // Fetch dock status every 1 second
+        setInterval(fetchDockStatus, 1000);
+    </script>
+</body>
+</html>

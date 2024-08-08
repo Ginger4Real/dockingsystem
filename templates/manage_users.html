@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Add your styles here */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Dock Management</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('assign_dock') }}">Assign Dock</a></li>
+                    <li><a href="{{ url_for('clear_dock') }}">Clear Dock</a></li>
+                    <li><a href="{{ url_for('dock_status') }}">Dock Status</a></li>
+                    <li><a href="{{ url_for('manage_users') }}">Manage Users</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <div class="main-content">
+            <header>
+                <div class="header-title">
+                    <h1>Manage Users</h1>
+                </div>
+                <div class="header-user">
+                    <form id="logout-form" action="{{ url_for('logout') }}" method="POST" style="display:inline;">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+            </header>
+            <main>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Admin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.email }}</td>
+                            <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+                            <td>
+                                {% if user.email != 'admin@admin.com' %}
+                                <form method="post" action="{{ url_for('manage_users') }}" style="display:inline;">
+                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                    {% if user.is_admin %}
+                                    <button type="submit" name="action" value="remove_admin">Remove Admin</button>
+                                    {% else %}
+                                    <button type="submit" name="action" value="make_admin">Make Admin</button>
+                                    {% endif %}
+                                    <button type="submit" name="action" value="delete">Delete</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

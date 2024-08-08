@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 20px;
+            background-color: #34495e;
+            text-align: center;
+        }
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 20px 0;
+        }
+        .sidebar-nav ul li {
+            margin: 10px 0;
+        }
+        .sidebar-nav ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+            transition: background-color 0.3s;
+        }
+        .sidebar-nav ul li a:hover {
+            background-color: #16a085;
+        }
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        header {
+            margin-bottom: 20px;
+        }
+        .header-title h1 {
+            margin: 0;
+        }
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        th {
+            background-color: #f4f4f4;
+            text-align: left;
+        }
+        /* Button Styles */
+        .button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .danger {
+            background-color: #dc3545;
+        }
+        .danger:hover {
+            background-color: #c82333;
+        }
+        .success {
+            background-color: #28a745;
+        }
+        .success:hover {
+            background-color: #218838;
+        }
+        /* Flash Messages */
+        .flash {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash.danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Dock Management</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('index') }}">Assign Dock</a></li>
+                    <li><a href="{{ url_for('index') }}">Clear Dock</a></li>
+                    <li><a href="{{ url_for('index') }}">Dock Status</a></li>
+                    {% if session.get('is_admin') %}
+                        <li><a href="{{ url_for('admin_panel') }}">Admin Panel</a></li>
+                    {% endif %}
+                    <form id="logout-form" action="{{ url_for('logout') }}" method="POST">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                                </ul>
+            </nav>
+        </aside>
+        <div class="main-content">
+            <header>
+                <div class="header-title">
+                    <h1>Admin Panel</h1>
+                </div>
+            </header>
+            <main>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <h2>User Management</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Admin Status</th>
+                            <th>2FA Enabled</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.email }}</td>
+                            <td>{{ 'Admin' if user.is_admin else 'User' }}</td>
+                            <td>{{ 'Enabled' if user.two_fa_enabled else 'Disabled' }}</td>
+                            <td>
+                                <form method="post" action="{{ url_for('admin_panel') }}" style="display:inline;">
+                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                    {% if not user.is_admin %}
+                                        <button type="submit" name="action" value="make_admin" class="button">Make Admin</button>
+                                    {% else %}
+                                        <button type="submit" name="action" value="remove_admin" class="button">Remove Admin</button>
+                                    {% endif %}
+                                    <button type="submit" name="action" value="disable_2fa" class="button danger">Disable 2FA</button>
+                                    <button type="submit" name="action" value="delete" class="button danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                </form>
+                
+            </main>
+        </div>
+    </div>
+</body>
+</html>

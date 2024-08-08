@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dock Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .welcome-message {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .welcome-message h2 {
+            margin: 0;
+        }
+        .header-user {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .header-user form {
+            display: inline;
+            margin: 5px 0;
+        }
+        .logout-button, .settings-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .logout-button:hover, .settings-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Dock Management</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('index') }}">Assign Dock</a></li>
+                    <li><a href="{{ url_for('index') }}">Clear Dock</a></li>
+                    <li><a href="{{ url_for('index') }}">Dock Status</a></li>
+                    {% if session.get('is_admin') %}
+                        <li><a href="{{ url_for('admin_panel') }}">Admin Panel</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </aside>
+        <div class="main-content">
+            <header>
+                <div class="header-title">
+                    <h1>Dock Management System</h1>
+                </div>
+                <div class="header-user">
+                    <form id="settings-form" action="{{ url_for('settings') }}" method="GET">
+                        <button type="submit" class="settings-button">Settings</button>
+                    </form>
+                    <form id="logout-form" action="{{ url_for('logout') }}" method="POST">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+            </header>
+            <main>
+                <section class="form-section">
+                    <h2>Assign Dock</h2>
+                    <form id="dock-form">
+                        <div class="form-group">
+                            <label for="license-plate">License Plate:</label>
+                            <input type="text" id="license-plate" name="license-plate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dock-number">Select Dock:</label>
+                            <select id="dock-number" name="dock-number" required>
+                                <option value="" disabled selected>Select a dock</option>
+                                <!-- Docks will be dynamically populated here -->
+                            </select>
+                        </div>
+                        <button type="submit">Assign Dock</button>
+                    </form>
+                </section>
+                <section class="list-section">
+                    <h2>Current Dock Assignments</h2>
+                    <ul id="dock-list">
+                        <!-- Dock assignments will be dynamically populated here -->
+                    </ul>
+                </section>
+                <section class="form-section">
+                    <h2>Clear Dock</h2>
+                    <form id="clear-form">
+                        <div class="form-group">
+                            <label for="clear-dock-number">Select Dock to Clear:</label>
+                            <select id="clear-dock-number" name="clear-dock-number" required>
+                                <option value="" disabled selected>Select a dock</option>
+                                <!-- Docks will be dynamically populated here -->
+                            </select>
+                        </div>
+                        <button type="submit">Clear Dock</button>
+                    </form>
+                </section>
+            </main>
+            <footer>
+                <a href="{{ url_for('dock_status') }}" class="status-link">View Dock Status</a>
+            </footer>
+        </div>
+    </div>
+    <div id="notification" class="notification"></div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
